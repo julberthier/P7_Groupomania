@@ -59,7 +59,7 @@ exports.login = (req, res, next) => {
 	emailCrypted = req.body.email;
 
 	const mail = sanitize(emailCrypt);
-	const password = sanitize(req.body.password);	
+	const password = sanitize(req.body.password);
 	
 	User.findOne({ raw: true, where: { email: mail }})
 		.then(user => {
