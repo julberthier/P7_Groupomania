@@ -1,30 +1,7 @@
 <template>
   <div class="glassmorphism container_central fs10">
-    <h1> {{msg}} </h1>
     <div class=" container_form">
-
-        <p class="form_title" v-if="signed == true">CONNEXION</p>
-        <p class="form_title" v-else>INSCRIPTION</p>
-
-        <p class="form_info" v-if="signed == true">Tu n'as pas encore de compte ? <span v-on:click="signIn()" class="account">Créer un compte</span></p>
-        <p class="form_info" v-else>Tu as déjà un compte ? <span v-on:click="loggedIn()" class="account">Se connecter</span></p>
-        
-          <div class="form_container_size"> 
-            <form action="" class="form_style">              
-              <input type="text" class="input_style minima"  placeholder="Nom d'utilisateur" v-if="signed == false" v-model="username">         
-              <input type="text" placeholder="Adresse email" class="input_style minima" v-model="email">
-              <input type="text" name="" id="" placeholder="Mot de passe" class="input_style minima password" v-model="password">
-              <span class="passwordHide" v-if="signed == false"></span>
-              <div v-if="signed === true && status == 'error_login'">
-                Attention, adresse mail et/ou mot de passe invalide(s).
-              </div>
-              <button type="button" class="form_btn minima" v-if="signed == true" @click="login()">
-                <span v-if="status == 'loading'"> Connexion en cours...</span>
-                <span v-else>Connexion</span>
-              </button>
-              <button type="button" class="form_btn minima" v-else @click="signUp()">S'inscrire</button>     
-            </form>
-          </div>
+        C'EST BIEN LA PAGE PROFIL
     </div>   
   </div>
 </template>
@@ -33,7 +10,7 @@
 import { mapState } from 'vuex'
 
 export default {
-  name: 'homepage',
+  name: 'profile',
   props: {
     msg: String,    
   }, data : function ()  {
@@ -67,14 +44,13 @@ export default {
         })
       },
       signUp: function () {
-        const auto =  this;
         this.$store.dispatch('signUp', {
           email: this.email,
           username: this.username,
           password: this.password
         })
-        .then(function() {
-          auto.login()
+        .then(function(response) {
+          console.log(response);
         })
         .catch(function(error) {
           console.log(error);

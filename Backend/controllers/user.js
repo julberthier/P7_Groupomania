@@ -9,7 +9,7 @@ const EMAIL_ADMIN = process.env.ADMIN;
 //ROUTES
 const passwordValidator = require('../middlewares/password-validator')
 let emailCrypted
-const emailCrypt = CryptoJS.AES.encrypt(emailCrypted, process.env.CRYPT_KEY).toString()
+const emailCrypt = CryptoJS.SHA3(emailCrypted, process.env.CRYPT_KEY).toString()
 
 exports.signup = (req, res, next) => {
 	let admin
@@ -58,11 +58,12 @@ exports.login = (req, res, next) => {
 
 	emailCrypted = req.body.email;
 
-	const mail = sanitize(emailCrypt);
+	const mail = sanitize(emailCrypt)
 	const password = sanitize(req.body.password);
-	
+
 	User.findOne({ raw: true, where: { email: mail }})
-		.then(user => {
+		.then(
+			user => {
 			if (!user) {
 				return res.status(401).json({ error: "Utilisateur non trouvé !" });
 			}
@@ -76,7 +77,8 @@ exports.login = (req, res, next) => {
 					res.status(200).json({						
 						userId: user.id,
 						username: user.username,
-						token: jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: "24h" })
+						token: jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: "24h" }),
+						isAdmin: user.isAdmin
 					});
 				})
 				.catch(error => res.status(500).json({ error } ));

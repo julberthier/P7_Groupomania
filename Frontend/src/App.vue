@@ -1,15 +1,15 @@
 <template>
   <img src="./assets/icon-left-font-monochrome-white.png" alt="" class="logo">
-  <Homepage />
+  <homepage />
 </template>
 
 <script>
-import Homepage from './components/Homepage.vue'
+import homepage from './components/homepage.vue'
 
 export default {
   name: 'App',
   components: {
-    Homepage
+    homepage
   }
 }
 </script>
