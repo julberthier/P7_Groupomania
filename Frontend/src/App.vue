@@ -1,16 +1,11 @@
 <template>
-  <img src="./assets/icon-left-font-monochrome-white.png" alt="" class="logo">
-  <homepage />
+  <router-view></router-view>
 </template>
 
 <script>
-import homepage from './components/homepage.vue'
 
 export default {
-  name: 'App',
-  components: {
-    homepage
-  }
+  name: 'App'
 }
 </script>
 
@@ -21,14 +16,6 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100%;
-}
-
-.logo {
-  width: 250px;
-  position: fixed;
-  top: 90px;
-  left: 435px;
-  z-index: -1;
 }
 
 *,
@@ -47,4 +34,5 @@ body {
   height: 100vh;
   width: 100%;
 }
+
 </style>

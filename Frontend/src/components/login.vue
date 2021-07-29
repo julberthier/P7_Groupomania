@@ -1,6 +1,7 @@
 <template>
+  <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_login"/>
+
   <div class="glassmorphism container_central fs10">
-    <h1> {{msg}} </h1>
     <div class=" container_form">
 
         <p class="form_title" v-if="signed == true">CONNEXION</p>
@@ -33,19 +34,25 @@
 import { mapState } from 'vuex'
 
 export default {
-  name: 'homepage',
-  props: {
-    msg: String,    
-  }, data : function ()  {
+  name: 'login', 
+  data : function ()  {
     return { 
     signed: true,
     username: '',
     email: '',
     password: '',
     }
-  }, computed : {
+  },
+  mounted: function() {
+      if (this.$store.state.user.id != -1) {
+      this.$router.push('/home');
+      return;
+    }
+  },
+  computed : {
     ...mapState(['status'])
-  }, methods: {
+  }, 
+  methods: {
       signIn: function () {
         this.signed = false;
       },
@@ -53,35 +60,34 @@ export default {
         this.signed = true;
       },
       login: function(){
-        const auto =  this;
+        const self =  this;
         this.$store.dispatch('login', {
           email: this.email,
           username: this.username,
           password: this.password
         })
         .then(function() {
-          auto.$router.push('profile')
+          self.$router.push('/home');
         })
         .catch(function(error) {
           console.log(error);
         })
       },
       signUp: function () {
-        const auto =  this;
+        const self =  this;
         this.$store.dispatch('signUp', {
           email: this.email,
           username: this.username,
           password: this.password
         })
         .then(function() {
-          auto.login()
+          self.login();
         })
         .catch(function(error) {
           console.log(error);
         })
       }
     }
-
 }
 </script>
 
@@ -98,6 +104,14 @@ a {
 img {
   width: 100px;
 }
+
+.logo_login {
+  width: 250px;
+  position: fixed;
+  top: 90px;
+  left: 435px;
+  z-index: -1;
+  }
 
 .fs10 {
   font-size: 12px;

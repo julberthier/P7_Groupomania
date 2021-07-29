@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sanitize = require('mongo-sanitize');
-const CryptoJS = require("crypto-js");
+// const CryptoJS = require("crypto-js");
 const SECRET_KEY = process.env.SECRET_KEY;
 const { User } = require('../models');
 const EMAIL_ADMIN = process.env.ADMIN;
@@ -9,7 +9,7 @@ const EMAIL_ADMIN = process.env.ADMIN;
 //ROUTES
 const passwordValidator = require('../middlewares/password-validator')
 let emailCrypted
-const emailCrypt = CryptoJS.SHA3(emailCrypted, process.env.CRYPT_KEY).toString()
+// const emailCrypt = CryptoJS.SHA3(emailCrypted, process.env.CRYPT_KEY).toString()
 
 exports.signup = (req, res, next) => {
 	let admin
@@ -39,7 +39,7 @@ exports.signup = (req, res, next) => {
 		.then(async hash =>  {  
 		await User.create({
 				username: req.body.username,
-				email: emailCrypt,
+				email: emailCrypted,
 				password: hash,
 				bio: req.body.bio,
 				isAdmin: admin
@@ -58,18 +58,16 @@ exports.login = (req, res, next) => {
 
 	emailCrypted = req.body.email;
 
-	const mail = sanitize(emailCrypt)
+	const mail = sanitize(emailCrypted)
 	const password = sanitize(req.body.password);
 
 	User.findOne({ raw: true, where: { email: mail }})
-		.then(
-			user => {
+		.then( async user => {
 			if (!user) {
 				return res.status(401).json({ error: "Utilisateur non trouvé !" });
 			}
 
-			bcrypt
-				.compare(password, user.password)
+			await bcrypt.compare(password, user.password)
 				.then((valid) => {
 					if (!valid) {
 						return res.status(401).json({ error: "Mot de passe incorrect !" });
@@ -130,12 +128,12 @@ exports.deleteUser = (req, res, next) => {
 };
 
 exports.getOneUser = (req, res, next) => {
-	const id = req.params.id;  
-	User.findByPk(id)
-	  .then(user => { res.send(user) })
+	const id = req.body.id;	
+	User.findOne({where: {id: id}})
+	  .then(user => { res.status(200).json(user)})
 	  .catch(() => { res.status(500).send({ message: " Impossible de trouver l'utilisateur."});
 	  });
-  }
+}
 
 exports.getAllUser = (req, res, next) => {
 	User.findAll()

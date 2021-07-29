@@ -14,14 +14,14 @@ const userRoutes = require('./routes/user');
 
 const app = express();
 
-const rateLimiterUsingThirdParty = rateLimit({
-    windowMs: 24 * 60 * 60 * 1000, // 24 hrs in milliseconds
-    max: 100,
-    message: 'You have exceeded the 100 requests in 24 hrs limit!', 
-    headers: true,
-  });
+// const rateLimiterUsingThirdParty = rateLimit({
+//     windowMs: 24 * 60 * 60 * 1000, // 24 hrs in milliseconds
+//     max: 100,
+//     message: 'You have exceeded the 100 requests in 24 hrs limit!', 
+//     headers: true,
+//   });
   
-app.use(rateLimiterUsingThirdParty)
+// app.use(rateLimiterUsingThirdParty)
   
 let expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
   
