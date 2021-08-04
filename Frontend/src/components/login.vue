@@ -4,8 +4,8 @@
   <div class="glassmorphism container_central fs10">
     <div class=" container_form">
 
-        <p class="form_title" v-if="signed == true">CONNEXION</p>
-        <p class="form_title" v-else>INSCRIPTION</p>
+        <p class="form_title font" v-if="signed == true">CONNEXION</p>
+        <p class="form_title font" v-else>INSCRIPTION</p>
 
         <p class="form_info" v-if="signed == true">Tu n'as pas encore de compte ? <span v-on:click="signIn()" class="account">Créer un compte</span></p>
         <p class="form_info" v-else>Tu as déjà un compte ? <span v-on:click="loggedIn()" class="account">Se connecter</span></p>
@@ -14,16 +14,16 @@
             <form action="" class="form_style">              
               <input type="text" class="input_style minima"  placeholder="Nom d'utilisateur" v-if="signed == false" v-model="username">         
               <input type="text" placeholder="Adresse email" class="input_style minima" v-model="email">
-              <input type="text" name="" id="" placeholder="Mot de passe" class="input_style minima password" v-model="password">
+              <input type="password" name="" id="" placeholder="Mot de passe" class="input_style minima password" v-model="password">
               <span class="passwordHide" v-if="signed == false"></span>
               <div v-if="signed === true && status == 'error_login'">
                 Attention, adresse mail et/ou mot de passe invalide(s).
               </div>
-              <button type="button" class="form_btn minima" v-if="signed == true" @click="login()">
+              <button type="button" class="form_btn minima font" v-if="signed == true" @click="login()">
                 <span v-if="status == 'loading'"> Connexion en cours...</span>
                 <span v-else>Connexion</span>
               </button>
-              <button type="button" class="form_btn minima" v-else @click="signUp()">S'inscrire</button>     
+              <button type="button" class="form_btn minima font" v-else @click="signUp()">S'inscrire</button>     
             </form>
           </div>
     </div>   
@@ -105,6 +105,10 @@ img {
   width: 100px;
 }
 
+.fs15 {
+    font-size: 14px;
+}
+
 .logo_login {
   width: 250px;
   position: fixed;
@@ -147,7 +151,6 @@ img {
 
 .form_title {
   font-size: 35px;
-  font-family: 'Patua One', cursive;
 }
 
 .form_info {
@@ -209,7 +212,6 @@ img {
   font-weight: 800;  
   text-transform: uppercase;
   cursor: pointer;
-  font-family: 'Patua One', cursive;
   font-size: 15px;
 }
 

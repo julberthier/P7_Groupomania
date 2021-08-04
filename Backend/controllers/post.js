@@ -4,18 +4,19 @@ const { User } = require('../models');
 
 
 exports.createPost = (req, res, next) => {
-    const postObject = JSON.parse(req.body.post);
-	delete postObject._id;
+
+    const postObject = JSON.parse(req.body);
+	// delete postObject._id;
+    console.log(postObject);
+
     const post = {        
       title: req.body.title,
       content: req.body.content,
-      userId: req.body.userId,
+      id: req.body.id,
       attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-    };
+    };    
     Post.create(post)
-        .then( res.send(post),
-        res.status(201).json({ message: "Publication mise en ligne !" })
-        )
+        .then(() => res.status(201).json({ message: "Publication mise en ligne !" }))
         .catch(() => res.status(500).json({ message : " Impossible de publier le post ! "}))
 };  
 
@@ -32,7 +33,7 @@ exports.modifyPost = (req, res, next) => {
     // ? =>  Operateur ternaire pour savoir si req.file existe.
     { 
         ...JSON.parse(req.body.post),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get('host')}/assets/images/${req.file.filename}`
     } : { ...req.body}
     Post.updateOne({ id: req.params.id }, { ...postObject, id: req.params.id })
         .then(() => {
@@ -66,3 +67,41 @@ exports.getAllPost = (req, res, next) => {
         .catch(error => { res.status(400).json({ error: error });
     });
 };
+
+exports.likePost = (req, res, next) => {
+
+	const userId = req.body.userId;
+	const numberLikes = req.body.like;
+	
+	Post.findOne({ _id: req.params.id })
+    .then(post => {
+        switch(numberLikes) {
+            case +1:
+                Post.updateOne({_id: req.params.id}, { $push: {usersLiked: userId}, $inc: {likes: +1}
+				})
+            .then(() => res.status(200).json({ message: "J'aime la publication !" }))
+            .catch(error => res.status(400).json({ error }));
+            break;
+
+            case -1:
+                Post.updateOne({_id: req.params.id}, { $push: {usersDisliked: userId}, $inc: {dislikes: +1}
+				})
+            .then(() => res.status(200).json({ message: "Je n'aime pas la publication !"}))
+            .catch(error => res.status(400).json({ error }));
+            break;
+
+            case 0:				
+				let promise;
+				if (post.usersLiked.find((element) => element === userId)) {
+					promise = Post.updateOne({_id: req.params.id}, { $pull: {usersLiked: userId}, $inc: {likes: -1}})			
+				} else {
+					promise = Post.updateOne({_id: req.params.id}, { $pull: {usersDisliked: userId}, $inc: {dislikes: -1}})
+				} 
+				promise               
+					.then(() => res.status(200).json({ message: "Avis mis à jour !"}))
+					.catch(error => res.status(400).json({ error }));
+					break;
+        }
+    })
+	.catch(error => res.status(400).json({ error: error }))
+}

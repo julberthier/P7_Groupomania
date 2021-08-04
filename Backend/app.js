@@ -11,6 +11,7 @@ const mysql = require('mysql2');
 //ROUTES 
 const postRoutes = require('./routes/post');
 const userRoutes = require('./routes/user');
+const commentRoutes = require('./routes/comments')
 
 const app = express();
 
@@ -42,7 +43,8 @@ app.use(helmet());
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  password: process.env.DB_PASS,  
+  password: process.env.DB_PASS,
+  database: "database_development_groupo",
 });
 
 db.connect(function (err) {
@@ -71,5 +73,6 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/groupomania/post', postRoutes);
 app.use('/api/groupomania/user', userRoutes);
+app.use('/api/groupomania/comment', commentRoutes);
 
 module.exports = app;

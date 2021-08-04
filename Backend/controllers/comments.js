@@ -1,6 +1,5 @@
 const fs = require('fs');
 const { Post } = require('../models/post');
-const postId = post.id;
 const comments = require('../models').comment;
 
 exports.createComment = (req, res, next) => {

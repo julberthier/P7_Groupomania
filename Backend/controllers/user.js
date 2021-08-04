@@ -41,7 +41,8 @@ exports.signup = (req, res, next) => {
 				username: req.body.username,
 				email: emailCrypted,
 				password: hash,
-				bio: req.body.bio,
+				bio: 'Je suis un utilisateur de Groupomania',
+				photo: null,
 				isAdmin: admin
 			})
 			.then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
@@ -73,8 +74,10 @@ exports.login = (req, res, next) => {
 						return res.status(401).json({ error: "Mot de passe incorrect !" });
 					}
 					res.status(200).json({						
-						userId: user.id,
+						id: user.id,
 						username: user.username,
+						email: user.email,
+						photo: user.photo,
 						token: jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: "24h" }),
 						isAdmin: user.isAdmin
 					});
@@ -85,50 +88,43 @@ exports.login = (req, res, next) => {
 };
 
 exports.modifyUser = (req, res, next) => {
-	bcrypt.hash(req.body.password, 10)
-	.then(hash => {
-
 	const id = req.params.id;
 
-	const modifyProfile = req.body ? {
-	  username: req.body.username,
-	  email : req.body.email,
-	  password : hash,
-    } 
-    : 
-	{
-	username: req.body.username,
-	email : req.body.email,
-	password : hash,
-	} 
+	const modifyProfile = req.file ? {
+		username: req.body.username,
+		bio: req.body.bio,
+		photo: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+	    } : {...req.body};
 
-	User.update(modifyProfile, {raw: true, where: { id: id } })
-	  .then(user => {
-		if (user == 1) {res.send({ message: "Utilisateur modifié."});} 
-		else { res.send({message: "Impossible de mettre à jour l'utilisateur."})}
-	  })
-	  .catch(() => { res.status(500).send({ message: "Operation impossible, veuillez réessayer ulterieurement." });
-	  });
+	User.update(modifyProfile, {
+		raw: true, 
+		where: { id: id } 
 	})
+	  .then(() => {
+		res.status(201).json({ message: "Utilisateur mis à jour !" + id });
+	  })
+	  .catch(() => { 
+		res.status(400).json({ message: "Operation impossible, veuillez réessayer ulterieurement." });
+	  });	
   };
 
 exports.deleteUser = (req, res, next) => {
-	const id = req.body.id;
+	const id = req.params.id;
 
 	User.destroy({raw: true, where: { id: id }})
 	  .then(user => {
 		if (user == 1) {
 		  res.send({ message: "Utilisateur supprimé !" });
-		} else { res.send({ message: "Impossible de supprimer l'utilisateur." })
+		} else { res.send({ message: "Impossible de supprimer l'utilisateur."})
 		}
 	  })
 	  .catch(() => {
-		res.status(500).send({ message: "Erreur lors de la suppression de l'utilisateur." });
+		res.status(500).send({ message: "Erreur lors de la suppression de l'utilisateur." + id});
 	  });
 };
 
 exports.getOneUser = (req, res, next) => {
-	const id = req.body.id;	
+	const id = req.params.id;	
 	User.findOne({where: {id: id}})
 	  .then(user => { res.status(200).json(user)})
 	  .catch(() => { res.status(500).send({ message: " Impossible de trouver l'utilisateur."});
