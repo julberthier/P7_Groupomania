@@ -80,9 +80,9 @@ const store = createStore({
         }
         localStorage.removeItem('user');
         },
-        modifyUser: function(state, user, userInfos){
+        modifyUser: function(state, user, userInfos){          
           instance.defaults.headers.common['Authorization'] = user.token;
-          state.user = user;
+          localStorage.setItem('user', JSON.stringify(user));
           state.userInfos = userInfos;
         },
         articlesList: function(state, articles) {
@@ -160,7 +160,7 @@ const store = createStore({
                   });
         },
         getAllPosts: ({commit}) => {
-            instance.get('/post/')
+            instance.get('/post')
                 .then(function(response){
                   commit('articlesList', response.data)
                 })
@@ -189,7 +189,7 @@ const store = createStore({
               })
         },
         getComment: ({commit}) => {
-            instance.get('/comment')
+            instance.get(`/comment/${store.state.comments.id}`)
               .then(function(response) {
               commit('comments', response.data)
               })

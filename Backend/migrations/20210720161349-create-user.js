@@ -30,6 +30,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BOOLEAN
       },
+      photo: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

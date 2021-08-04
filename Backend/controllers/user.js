@@ -42,7 +42,7 @@ exports.signup = (req, res, next) => {
 				email: emailCrypted,
 				password: hash,
 				bio: 'Je suis un utilisateur de Groupomania',
-				photo: null,
+				photo: '',
 				isAdmin: admin
 			})
 			.then(() => res.status(201).json({ message: 'Utilisateur créé !' }))

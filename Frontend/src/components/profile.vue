@@ -41,7 +41,7 @@ export default {
   data: function () {
     return {
     status: '',
-    photo: null,   
+    photo: '',   
     }
   },
   mounted: function () {

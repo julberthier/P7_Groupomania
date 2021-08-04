@@ -1,5 +1,5 @@
 <template>
-  <div v-if="articles.length == 0" class="font post_none"> Pas de publications </div>
+  <div v-if="posts.length == 0" class="font post_none"> Pas de publications </div>
   <div class="container_post" v-else>
       <div class="post_box">
           <div class="container_info_post">
@@ -10,7 +10,7 @@
 
             <div>
                 <h4> {{ articles.title }} </h4>
-                <img>
+                <img :src="articles.attachment">
                 <div class="content_post"> {{ articles.content }} </div>
             </div>
 
@@ -57,13 +57,12 @@ export default {
     name: 'Articles',
     data: function() {
         return {  
-            articles: [],        
+            posts: [],        
             isAdmin: '',  
             formStatus: null,
         }
     },
     mounted : function () {
-    console.log(this.$store.state.user);
     if (this.$store.state.user.id === -1) {
       this.$router.push('/');
       return;

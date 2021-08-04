@@ -46,7 +46,7 @@ export default {
         id: '',
         title: '',
         content: '', 
-        image: '',
+        attachment: '',
         formStatus: null,
         }
     },
@@ -67,16 +67,11 @@ export default {
     },
     methods: {
         upload: function (){
-            this.image = this.$refs.image.files[0];
-            console.log(this.image.name);
+            this.attachment = this.$refs.image.files[0];
+            console.log(this.attachment.name);
         },
         submit: function (){
-            console.log(this.$store.state.user.id);
-            console.log(this.$store.state.user.token);
-
-            console.log(document.getElementById('title').value);
-            console.log(document.getElementById('content').value);
-            console.log(document.getElementById('image').files[0].name);
+            console.log(document.getElementById('image').files[0]);
 
             this.v$.$touch();
             if (this.v$.$invalid) {
@@ -91,7 +86,7 @@ export default {
                 id: this.$store.state.user.id,
                 title: document.getElementById('title').value,
                 content: document.getElementById('content').value,
-                image: document.getElementById('image').files[0].name,
+                attachment: document.getElementById('image').files[0].name,
             })
                 .then(() => {
                     this.$router.push('/home');
