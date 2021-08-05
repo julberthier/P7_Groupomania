@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userCtrl = require("../controllers/user");
 const rateLimit = require("express-rate-limit");
+const multer = require('../middlewares/multer-config');
 
 const createAccountLimiter = rateLimit({
 	windowMs: 60 * 60 * 1000, // 1 hour window
@@ -14,11 +15,11 @@ router.post('/signup', createAccountLimiter, userCtrl.signup);
 
 router.post('/login', userCtrl.login);
 
-router.put('/:id', createAccountLimiter, userCtrl.modifyUser);
+router.put('/:id', createAccountLimiter, multer, userCtrl.modifyUser);
 
 router.delete('/:id', userCtrl.deleteUser);
 
-router.get('/:id', userCtrl.getOneUser);
+router.get('/:id', multer, userCtrl.getOneUser);
 
 router.get('/', userCtrl.getAllUser);
 

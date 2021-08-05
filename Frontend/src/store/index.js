@@ -58,7 +58,7 @@ const store = createStore({
             state.status = status;
         },
         logUser: function(state, user) {
-            instance.defaults.headers.common['Authorization'] = user.token;
+            instance.defaults.headers.common['Authorization'] = user.token;            
             localStorage.setItem('user', JSON.stringify(user));
             state.user = user;
         }, 
@@ -80,17 +80,14 @@ const store = createStore({
         }
         localStorage.removeItem('user');
         },
-        modifyUser: function(state, user, userInfos){          
-          instance.defaults.headers.common['Authorization'] = user.token;
-          localStorage.setItem('user', JSON.stringify(user));
+        modifyUser: function(state, userInfos){   
           state.userInfos = userInfos;
         },
         articlesList: function(state, articles) {
           state.articles = articles;
         },
-        createArticles: function(state, articles, user) {
+        articles: function(state, articles, user) {
           state.user = user;
-          localStorage.setItem('articles', JSON.stringify(articles));
           state.articles = articles;
         }
     },
@@ -168,25 +165,33 @@ const store = createStore({
                   commit('setStatus', 'error_getList')
                 })
         },
-        createPost: ({commit}, createArticles) => {
-            instance.post('/post', createArticles)
+        createPost: ({commit}, articles) => {
+          return new Promise((resolve, reject) => {
+            instance.post('/post', articles)
               .then(function(response){
                 commit('setStatus', 'creating');
                 commit('articles', response.data)
+                console.log(response);
+                resolve(response)
               })
-              .catch(function(){
+              .catch(function(error){
                 commit('setStatus', 'error_createArticles')
+                reject(error)
               })
+          })
         },
         deletePost: ({commit}) => {
-            instance.delete(`/post/${store.state.articles.id}`)
-              .then(function(){
-                commit('setStatus', 'deleting');
-                commit('articles', 'La publication a été suppriméé')
-              })
-              .catch(function(){
-                commit('setStatus', 'error_delete');               
-              })
+            console.log(store.state.articles);
+            console.log(store.state.user);
+            commit('setStatus', 'deleting'); 
+            // instance.delete(`/post/${store.state.articles.id}`)
+            //   .then(function(){
+            //     commit('setStatus', 'deleting');
+            //     commit('articles', 'La publication a été suppriméé')
+            //   })
+            //   .catch(function(){
+            //     commit('setStatus', 'error_delete');               
+            //   })
         },
         getComment: ({commit}) => {
             instance.get(`/comment/${store.state.comments.id}`)

@@ -1,26 +1,29 @@
 const fs = require('fs');
-const { Post } = require('../models');
+var { Post } = require('../models');
+const { User } = require('../models');
 
-exports.createPost = (req, res, next) => {
+exports.createPost = async (req, res, next) => {
 
-    // const postObject = JSON.parse(req.body);
-	// delete postObject._id;
-    // console.log(postObject);
+    const postObject = JSON.parse(JSON.stringify(req.body));
+    let articles
 
-    const post = new Post ({        
-      title: req.body.title,
-      content: req.body.content,
-      id: req.body.id,
-      attachment: `${req.protocol}://${req.get('host')}/images/${req.file.name}`,
-      likes: 0,
-      dislikes: 0,
-      usersLiked: [],
-      usersDisliked: [],
-    });    
-    
-    Post.create(post)
-        .then(() => res.status(201).json({ message: "Publication mise en ligne !" }))
-        .catch(() => res.status(500).json({ message : " Impossible de publier le post ! "}))
+    if (req.file !== undefined || '') {    
+        articles = {   
+        ...postObject,
+        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        }
+    } else {
+        articles = { 
+        ...req.body,
+        }
+    }
+
+    await Post.create(articles)
+        .then(()=> res.status(201).json({ message: 'Message créé !' }))
+        .catch((err) => {
+            res.status(500); 
+            console.log(err)
+        })
 };  
 
 
@@ -36,7 +39,7 @@ exports.modifyPost = (req, res, next) => {
     // ? =>  Operateur ternaire pour savoir si req.file existe.
     { 
         ...JSON.parse(req.body.post),
-        attachment: `${req.protocol}://${req.get('host')}/assets/images/${req.file.filename}`
+        attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body}
     Post.updateOne({ id: req.params.id }, { ...postObject, id: req.params.id })
         .then(() => {
@@ -44,7 +47,7 @@ exports.modifyPost = (req, res, next) => {
         })
         .catch(error => { res.status(400).json({ error: error });
         });
-}
+};
 
 exports.deletePost = (req, res, next) => {
     Post.findOne({ id: req.params.id })    
@@ -63,28 +66,31 @@ exports.deletePost = (req, res, next) => {
 
 exports.getAllPost = (req, res, next) => {
     Post.findAll()
-        .then(post => { res.status(200).json(post) })
-        .catch(error => { res.status(400).json({ error: error });
+        .then(posts => {
+            res.send(posts)
+         })
+        .catch(error => {             
+        res.status(400).json({ error: error });
     });
 };
 
 exports.likePost = (req, res, next) => {
 
-	const userId = req.body.id;
+	const Id = req.body.id;
 	const numberLikes = req.body.like;
 	
 	Post.findOne({ _id: req.params.id })
     .then(post => {
         switch(numberLikes) {
             case +1:
-                Post.updateOne({_id: req.params.id}, { $push: {usersLiked: userId}, $inc: {likes: +1}
+                Post.updateOne({_id: req.params.id}, { $push: {usersLiked: Id}, $inc: {likes: +1}
 				})
             .then(() => res.status(200).json({ message: "J'aime la publication !" }))
             .catch(error => res.status(400).json({ error }));
             break;
 
             case -1:
-                Post.updateOne({_id: req.params.id}, { $push: {usersDisliked: userId}, $inc: {dislikes: +1}
+                Post.updateOne({_id: req.params.id}, { $push: {usersDisliked: Id}, $inc: {dislikes: +1}
 				})
             .then(() => res.status(200).json({ message: "Je n'aime pas la publication !"}))
             .catch(error => res.status(400).json({ error }));
@@ -92,10 +98,10 @@ exports.likePost = (req, res, next) => {
 
             case 0:				
 				let promise;
-				if (post.usersLiked.find((element) => element === userId)) {
-					promise = Post.updateOne({_id: req.params.id}, { $pull: {usersLiked: userId}, $inc: {likes: -1}})			
+				if (post.usersLiked.find((element) => element === Id)) {
+					promise = Post.updateOne({_id: req.params.id}, { $pull: {usersLiked: Id}, $inc: {likes: -1}})			
 				} else {
-					promise = Post.updateOne({_id: req.params.id}, { $pull: {usersDisliked: userId}, $inc: {dislikes: -1}})
+					promise = Post.updateOne({_id: req.params.id}, { $pull: {usersDisliked: Id}, $inc: {dislikes: -1}})
 				} 
 				promise               
 					.then(() => res.status(200).json({ message: "Avis mis à jour !"}))
@@ -104,4 +110,4 @@ exports.likePost = (req, res, next) => {
         }
     })
 	.catch(error => res.status(400).json({ error: error }))
-}
+};

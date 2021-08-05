@@ -1,17 +1,19 @@
 <template>
   <div v-if="posts.length == 0" class="font post_none"> Pas de publications </div>
+  
   <div class="container_post" v-else>
-      <div class="post_box">
+      <div class="post_box" v-for="post in posts" v-bind:key="post">
+
           <div class="container_info_post">
-              <button v-if="user.isAdmin == 1" class="delete_post_admin font">X</button>
-              <h6> Publié le : {{articles.date}} </h6>
-              <h5>Auteur: {{ articles.username }}</h5>
+              <button v-if="user.isAdmin == 1" class="delete_post_admin font" @click="deletePost()">X</button>
+              <h6> Publié le : {{post.createdAt}} </h6>
+              <h5>Auteur: {{ user.username }}</h5>
           </div>
 
             <div>
-                <h4> {{ articles.title }} </h4>
-                <img :src="articles.attachment">
-                <div class="content_post"> {{ articles.content }} </div>
+                <h4> {{ post.title }} </h4>
+                <img :src="post.image">
+                <div class="content_post"> {{ post.content }} </div>
             </div>
 
             <span class="likes_container">
@@ -29,7 +31,8 @@
             <div class="commented">
               <button v-if="user.isAdmin == 1" class="delete_post_admin font">X</button>
               <span> Auteur: {{ comments.username }}</span>
-              <div class="comment_box">COMMENTAIRES {{ comments.content }}</div>              
+              <div class="comment_box" v-if="comments.length == 0"> Il n'y a pas encore de commentaires...</div>
+              <div class="comment_box" v-else> {{ comments.content }}</div>              
             </div>
 
             <span class="comment_send">
@@ -57,7 +60,8 @@ export default {
     name: 'Articles',
     data: function() {
         return {  
-            posts: [],        
+            posts: [],  
+            comments: [],      
             isAdmin: '',  
             formStatus: null,
         }
@@ -68,6 +72,14 @@ export default {
       return;
     }
       this.$store.dispatch('getUserInfos');
+
+      axios.get('http://localhost:3000/api/groupomania/post')
+      .then(response=> {
+        this.posts = response.data;
+        console.log(response);
+      })
+      .catch((err) => console.log(err))
+
     },
     computed: {
       ...mapState({
@@ -87,7 +99,7 @@ export default {
       } else {
         this.formStatus = "PENDING";
 
-        this.store.dispatch('postComment')
+        this.$store.dispatch('postComment')
           .then(function() {
             this.formStatus = "OK";
             this.$router.push("/home");
@@ -97,15 +109,17 @@ export default {
       }
     },
     // Delete post
-    async deletePost() {
-      this.store.dispatch('deletePost')
-        .then(() => { this.$router.push("/home") })
+    deletePost() {
+      this.$store.dispatch('deletePost')
+        .then(() => { 
+          this.$router.push("/home") 
+        })
         .catch((error) => console.log(error));
     },
     // Delete comment
     async deleteComment() {
       await axios
-      this.store.dispatch('deleteComment')
+      this.$store.dispatch('deleteComment')
         .then(() => {
           this.$router.push("/home");
         })
@@ -122,6 +136,9 @@ export default {
 <style>
 
 .post_none {
+  position: fixed;
+  bottom: 25%;
+  left: 40%;
   font-size: 20px;
 }
 
@@ -132,16 +149,19 @@ export default {
   background-color: rgba(128, 128, 128, 0.15);
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  margin: 50px 0;
 }
 
 .post_box {
   width: 90%;
-  max-height: 80vh;
+  height: fit-content;
   display: flex;
   align-items: center;
   flex-direction: column;
   background-color: honeydew;
   position: relative;
+  margin: 25px;
 }
 
 .container_info_post {
@@ -167,7 +187,6 @@ export default {
 
 .content_post {
   height: 7vh;
-  background-color: indigo;
 }
 
 .likes_container {
@@ -194,7 +213,7 @@ export default {
 
 .commented{
   width: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
   max-height: 8vh;
   position: relative;
   background-color: hsl(57, 11%, 62%);
@@ -202,6 +221,7 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 10px 0;
+  margin-bottom: 4vh;
 }
 
 .comment_box {

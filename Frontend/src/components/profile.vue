@@ -4,7 +4,7 @@
       <span @click="goBack()" class="back_btn">⬅️ Retour à l'accueil </span> 
       <div class="font fs20">Mon espace perso</div>
 
-      <form @submit.prevent="submit" >  
+      <form @submit.prevent="submit" enctype="multipart/form-data">  
         <div class="container_perso"> 
             <div class="user_info font">
               <input type="text" placeholder="Changer mon pseudonyme" v-if="status == 'modifying'" id="username" :value="user.username">
@@ -13,8 +13,8 @@
               <span class="fs15" v-else>Mon adresse email:  {{ user.email }} </span>
             </div>
             <div > 
-               <label for="photo" class="font fs15">Mon avatar :</label>  
-              <input type="file"  ref="photo" placeholder="Changer mon avatar" v-if="status == 'modifying'" id="photo" @change="upload">
+               <label for="image" class="font fs15">Mon avatar :</label>  
+              <input type="file"  name="image" ref="image" placeholder="Changer mon avatar" v-if="status == 'modifying'" id="photo" @change="upload">
               <img :src="user.photo" v-else/>
             </div>
             <div>
@@ -23,7 +23,7 @@
             </div>
           </div>
           <span class="btn_account_manage">
-            <button type="submit" class="profile_btn minima font" v-if="status == 'modifying'" @click="modified()">Sauvegarder mes informations</button>
+            <button type="button" class="profile_btn minima font" v-if="status == 'modifying'" @click="modified()">Sauvegarder mes informations</button>
             <button type="button" class="profile_btn minima font" @click="modify()" v-else>Modifier mon compte</button>
             <button type="button" class="profile_btn minima font" @click="deleteUser()">Supprimer mon compte</button>
         </span>
@@ -40,8 +40,10 @@ export default {
   name: 'profile', 
   data: function () {
     return {
+    username: '',
+    bio: '',
     status: '',
-    photo: '',   
+    image: null,   
     }
   },
   mounted: function () {
@@ -59,18 +61,33 @@ export default {
   }
   ,methods: {
     upload: function (){
-          this.photo = this.$refs.photo.files[0];
-          console.log(this.$refs.photo.files[0].name);
+          this.image = this.$refs.image.files[0];
+          console.log(this.$refs.image.files[0]);
     },
     modify: function () {
       this.status = 'modifying'
     },    
     modified: function(){
-      this.$store.dispatch('modify', {   
-          username: document.getElementById("username").value,     
-          photo: this.$refs.photo.files[0],
-          bio: document.getElementById("bio").value
-        })
+      console.log(this.image);
+      // const self = this;
+      const bio = document.getElementById('bio').value
+      this.bio = bio
+
+      const username = document.getElementById('username').value
+      this.username = username
+
+      const formData = new FormData();
+      if (this.image !== null || "") {
+        formData.append("image", this.image)
+        formData.append("username", this.username)
+        formData.append("bio", this.bio)
+      }
+      else {
+        formData.append("username", this.username)
+        formData.append("bio", this.bio)
+      }
+
+      this.$store.dispatch('modify', formData)
         .then(function() {
           window.location = location;
         })

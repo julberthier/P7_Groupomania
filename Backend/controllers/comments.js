@@ -1,14 +1,14 @@
 const fs = require('fs');
-const { Post } = require('../models/post');
-const comments = require('../models').comment;
+const { Post } = require('../models');
+const { Comments } = require('../models');
 
 exports.createComment = (req, res, next) => {
     const commentaire = {
         content: req.body.content,
-        articleId: postId,
-        idUSERS: req.body.idUSERS,
+        articleId: Post.id,
+        idUSERS: req.body.id,
       };
-      comments.create(commentaire)
+      Comments.create(commentaire)
         .then(comment => { res.send(comment) })
         .catch(() => { res.status(500).json({ message: "Une erreur s'est produite lors de la création du commentaire "});
         });    
@@ -17,7 +17,7 @@ exports.createComment = (req, res, next) => {
 exports.deleteComment = (req, res, next) => {
 	const id = req.params.id;
 
-	comments.destroy({raw: true, where: { id: id }})
+	Comments.destroy({raw: true, where: { id: id }})
 	  .then(comment => {
 		if (comment == 1) {
 		  res.send({ message: "Commentaire supprimé !" });
@@ -30,9 +30,9 @@ exports.deleteComment = (req, res, next) => {
 }
 
 exports.getAllComments = (req, res, next) => {
-    comments.findAll()
+  Comments.findAll()
     .then(comments => { res.send(comments) })
-    .catch(err => { res.status(500).send({ message: "Operation impossible, veuillez réessayer ulterieurement." });
+    .catch(() => { res.status(500).send({ message: "Operation impossible, veuillez réessayer ulterieurement." });
 });
 }
 
@@ -41,15 +41,15 @@ exports.modifyComments = (req, res, next) => {
 
     const modifyComments = req.file ? {
         content: req.body.content,
-        articleId: postId,
-        idUSERS: req.body.idUSERS,
+        articleId: Post.id,
+        idUSERS: req.body.id,
     } : {  
         content: req.body.content,
-        articleId: postId,
-        idUSERS: req.body.idUSERS,
+        articleId: Post.id,
+        idUSERS: req.body.id,
     }
       
-    comments.update(modifyComments, {raw: true, where: { id: id }})
+    Comments.update(modifyComments, {raw: true, where: { id: id }})
       .then(modify => {
         if (modify == 1) { res.send({ message: "Le commentaire a été modifié" })} 
         else { res.send({ message: "Impossible de modifier le commentaire."

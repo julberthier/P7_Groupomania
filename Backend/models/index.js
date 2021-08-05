@@ -9,7 +9,7 @@ let sequelize;
 sequelize = new Sequelize(process.env.DB_DEV, process.env.DB_USER, process.env.DB_PASS, {
   host: 'localhost',
   dialect: 'mysql',
-  logging: false
+  logging: false,
 });
 
 fs

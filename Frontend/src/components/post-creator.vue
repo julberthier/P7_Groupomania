@@ -3,6 +3,7 @@
     <form 
         @submit.prevent="submit" 
         class="post_form" 
+        enctype="multipart/form-data"
     >
       <div>
           <label for="title" class="font">Titre de la publication</label>
@@ -19,12 +20,12 @@
             </div>   
       </div>
       <div>
-          <label for="image_link" class="font">Ajouter une image</label>
-          <input type="file" ref="image" id="image" @change="upload">
+          <label for="image" class="font">Ajouter une image</label>
+          <input type="file" name="image" ref="image" id="image" @change="upload">
       </div>
       <div>
-            <button type="submit" v-if="formStatus == 'pending'" class="font submit_post">En cours...</button>
-            <button type="submit" v-else class="font submit_post" @click="submit()">Publier</button>
+            <button type="button" v-if="formStatus == 'pending'" class="font submit_post">En cours...</button>
+            <button type="button" v-else class="font submit_post" @click="submit()" :data-id="user.id" id="submit_btn">Publier</button>
             <span v-if="!v$.content.$required && formStatus == 'error'" class="form_error">Veuillez remplir tous les champs</span>
       </div>
   </form>
@@ -36,6 +37,7 @@ import useVuelidate from '@vuelidate/core'
 import { required, minLength } from '@vuelidate/validators';
 import { mapState } from 'vuex'
 // import axios from 'axios'
+
 export default {
       setup () {
     return { v$: useVuelidate() }
@@ -43,10 +45,9 @@ export default {
     name: 'post-creator',
     data: function () {
         return { 
-        id: '',
         title: '',
         content: '', 
-        attachment: '',
+        image: null,
         formStatus: null,
         }
     },
@@ -67,11 +68,23 @@ export default {
     },
     methods: {
         upload: function (){
-            this.attachment = this.$refs.image.files[0];
-            console.log(this.attachment.name);
+            this.image = this.$refs.image.files[0];
         },
         submit: function (){
-            console.log(document.getElementById('image').files[0]);
+        const getId = document.getElementById('submit_btn')
+        const userId = getId.getAttribute('data-id')
+
+            const formData = new FormData();
+                if (this.image !== null || "") {
+                    formData.append("image", this.image);
+                    formData.append("title", this.title);
+                    formData.append("content", this.content);
+                    formData.append("userId", userId)
+                } else {
+                    formData.append("title", this.title);
+                    formData.append("content", this.content);
+                    formData.append("userId", userId)
+                }
 
             this.v$.$touch();
             if (this.v$.$invalid) {
@@ -82,14 +95,10 @@ export default {
                 this.formStatus = 'pending';      
             }
             
-            this.$store.dispatch('createPost', {
-                id: this.$store.state.user.id,
-                title: document.getElementById('title').value,
-                content: document.getElementById('content').value,
-                attachment: document.getElementById('image').files[0].name,
-            })
+            this.$store.dispatch('createPost', formData)
                 .then(() => {
-                    this.$router.push('/home');
+                    this.$store.commit('createArticles');
+                    window.location = location;
                  })
                 .catch((error)=> {
                     console.log(error);

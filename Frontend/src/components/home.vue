@@ -4,15 +4,16 @@
         <div class="logo_div">    
             <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_central"/>
         </div>
-        <div class=" container_form">
-            <Post />
+        <div></div>
+        <div class="container_home">
+            <Creator />
             <Articles />
         </div>   
     </div>
 </template>
 
 <script>
-import Post from './post.vue'
+import Creator from './post-creator.vue'
 import Nav from './nav.vue'
 import Articles from './articles.vue'
 
@@ -20,7 +21,7 @@ export default {
   name: 'home',
   components: {
     Nav,
-    Post,
+    Creator,
     Articles,
   }
 }
@@ -44,6 +45,11 @@ a {
 
 .font {
     font-family: 'Patua One', cursive;
+}
+
+.container_home {
+  overflow-y: scroll;
+  height: 80vh;
 }
 
 .logo_central {

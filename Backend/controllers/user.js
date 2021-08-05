@@ -42,7 +42,7 @@ exports.signup = (req, res, next) => {
 				email: emailCrypted,
 				password: hash,
 				bio: 'Je suis un utilisateur de Groupomania',
-				photo: '',
+				photo: ``,
 				isAdmin: admin
 			})
 			.then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
@@ -78,7 +78,7 @@ exports.login = (req, res, next) => {
 						username: user.username,
 						email: user.email,
 						photo: user.photo,
-						token: jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: "24h" }),
+						token: jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: "24h" }),
 						isAdmin: user.isAdmin
 					});
 				})
@@ -89,7 +89,7 @@ exports.login = (req, res, next) => {
 
 exports.modifyUser = (req, res, next) => {
 	const id = req.params.id;
-
+	
 	const modifyProfile = req.file ? {
 		username: req.body.username,
 		bio: req.body.bio,
