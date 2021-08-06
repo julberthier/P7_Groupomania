@@ -3,21 +3,18 @@ const { Post } = require('../models');
 const { Comment } = require('../models');
 
 exports.createComment = async (req, res, next) => {
-
-  console.log(req.body);
-
     const commentaire = {
         content: req.body.content,
         articlesId: req.body.articlesId,
         userId: req.body.userId,
+        username: req.body.username
       };
 
-      console.log('COMMENT', commentaire);
-      
       await Comment.create(commentaire)
         .then(comment => { res.send(comment) })
         .catch((err) => { 
           res.status(500);
+          console.log(err);
         });    
 }
 

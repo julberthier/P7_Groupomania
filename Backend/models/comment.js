@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Comment.init({    
+    username: DataTypes.STRING,
     userId: DataTypes.STRING,
     content: DataTypes.STRING,
     articlesId: DataTypes.INTEGER,

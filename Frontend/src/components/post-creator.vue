@@ -25,7 +25,7 @@
       </div>
       <div>
             <button type="button" v-if="formStatus == 'pending'" class="font submit_post">En cours...</button>
-            <button type="button" v-else class="font submit_post" @click="submit()" :data-id="user.id" id="submit_btn">Publier</button>
+            <button type="button" v-else class="font submit_post" @click="submit()" :data-id="user.id" :data_username="user.username" id="submit_btn">Publier</button>
             <span v-if="!v$.content.$required && formStatus == 'error'" class="form_error">Veuillez remplir tous les champs</span>
       </div>
   </form>
@@ -73,6 +73,7 @@ export default {
         submit: function (){
         const getId = document.getElementById('submit_btn')
         const userId = getId.getAttribute('data-id')
+        const username = getId.getAttribute('data_username')
 
             const formData = new FormData();
                 if (this.image !== null || "") {
@@ -80,10 +81,12 @@ export default {
                     formData.append("title", this.title);
                     formData.append("content", this.content);
                     formData.append("userId", userId)
+                    formData.append("username" , username)
                 } else {
                     formData.append("title", this.title);
                     formData.append("content", this.content);
                     formData.append("userId", userId)
+                    formData.append("username", username)
                 }
 
             this.v$.$touch();
@@ -98,7 +101,6 @@ export default {
             this.$store.dispatch('createPost', formData)
             this.$store.commit('articles');
             window.location = location;
-
         },
     }
 }

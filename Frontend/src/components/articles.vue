@@ -4,12 +4,12 @@
   
   <div  v-else>
       <div class="container_post" >
-            <div class="post_box" v-for="post in posts" v-bind:key="post">
+            <div class="post_box" v-for="post in posts" v-bind:key="post" onload="getDate()">
 
                 <div class="container_info_post">
                     <button v-if="user.isAdmin == 1" class="delete_post_admin font" @click="deletePost()" :data-id="post.id" id="adminDelete">X</button>
                     <button v-if="user.id === post.userId" class="delete_post_admin font" @click="deletePost()" :data-id="post.id" id="adminDelete">X</button>
-                    <h6 class="font"> Publié le : {{post.createdAt}} </h6>
+                    <h6 class="font"> Publié le : {{ post.createdAt }} </h6>
                     <h5 class="font">Auteur: {{ post.username }}</h5>
                 </div>
 
@@ -34,7 +34,7 @@
 
                   <span class="comment_send">
                     <form @submit.prevent="submit" enctype="multipart/form-data" class="commentPost">
-                    <textarea name="comment" id="comment" cols="60" rows="2" class="font text_comment" placeholder="Laisser mon commentaire..." :data-comment="user.id" :data-AI="post.id"></textarea>
+                    <textarea name="comment" id="comment" cols="60" rows="2" class="font text_comment" placeholder="Laisser mon commentaire..." :data-comment="user.id" :data-AI="post.id" :data-username="user.username"></textarea>
                     <button type="button" class="font" @click="submitComment()">Envoyer</button>
                     </form>
                   </span>
@@ -55,7 +55,6 @@ export default {
     name: 'Articles',
     data: function() {
         return {
-            date:'',
             userId: '',
             articlesId: '',  
             content : '',
@@ -72,15 +71,9 @@ export default {
     }
       this.$store.dispatch('getUserInfos');
 
-      let dateSort
-
       axios.get('http://localhost:3000/api/groupomania/post')
       .then(response=> {
         this.posts = response.data;
-         response.data.map((date) => {
-         dateSort = date.createdAt;          
-         console.log(dateSort);
-        });        
       })
       .catch((err) => console.log(err))
 
@@ -103,13 +96,15 @@ export default {
       const getComment = document.getElementById('comment') 
       this.articlesId = getComment.getAttribute('data-AI')
       this.userId = getComment.getAttribute('data-comment')
+      const username = getComment.getAttribute('data-username')
       this.content = getComment.value;
 
       const formData = new FormData();
       formData.append("content", this.content)
       formData.append("userId", this.userId)
       formData.append("articlesId", this.articlesId)
-
+      formData.append("username", username)
+      
       this.$store.dispatch('createComment', formData)
       this.$store.commit('comments');
       window.location = location;
@@ -143,7 +138,7 @@ export default {
           window.location = location;
         })
         .catch((error)=> console.log(error))
-    }},
+    }}
 }
 
 </script>
