@@ -1,23 +1,30 @@
 const fs = require('fs');
 const { Post } = require('../models');
-const { Comments } = require('../models');
+const { Comment } = require('../models');
 
-exports.createComment = (req, res, next) => {
+exports.createComment = async (req, res, next) => {
+
+  console.log(req.body);
+
     const commentaire = {
         content: req.body.content,
-        articleId: Post.id,
-        idUSERS: req.body.id,
+        articlesId: req.body.articlesId,
+        userId: req.body.userId,
       };
-      Comments.create(commentaire)
+
+      console.log('COMMENT', commentaire);
+      
+      await Comment.create(commentaire)
         .then(comment => { res.send(comment) })
-        .catch(() => { res.status(500).json({ message: "Une erreur s'est produite lors de la création du commentaire "});
+        .catch((err) => { 
+          res.status(500);
         });    
 }
 
 exports.deleteComment = (req, res, next) => {
 	const id = req.params.id;
 
-	Comments.destroy({raw: true, where: { id: id }})
+	Comment.destroy({raw: true, where: { id: id }})
 	  .then(comment => {
 		if (comment == 1) {
 		  res.send({ message: "Commentaire supprimé !" });
@@ -30,9 +37,11 @@ exports.deleteComment = (req, res, next) => {
 }
 
 exports.getAllComments = (req, res, next) => {
-  Comments.findAll()
+  Comment.findAll()
     .then(comments => { res.send(comments) })
-    .catch(() => { res.status(500).send({ message: "Operation impossible, veuillez réessayer ulterieurement." });
+    .catch((err) => { 
+      console.log(err);
+      res.status(500).send({ message: "Operation impossible, veuillez réessayer ulterieurement." });
 });
 }
 
@@ -49,7 +58,7 @@ exports.modifyComments = (req, res, next) => {
         idUSERS: req.body.id,
     }
       
-    Comments.update(modifyComments, {raw: true, where: { id: id }})
+    Comment.update(modifyComments, {raw: true, where: { id: id }})
       .then(modify => {
         if (modify == 1) { res.send({ message: "Le commentaire a été modifié" })} 
         else { res.send({ message: "Impossible de modifier le commentaire."

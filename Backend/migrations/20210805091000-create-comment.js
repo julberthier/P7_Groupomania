@@ -12,17 +12,13 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
+      articlesId: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
       content: {
         allowNull: false,
         type: Sequelize.STRING
-      },
-      likes: {
-        allowNull: true,
-        type: Sequelize.INTEGER
-      },
-      commentsId: {
-        allowNull: false,
-        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

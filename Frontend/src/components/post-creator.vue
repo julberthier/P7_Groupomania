@@ -96,13 +96,9 @@ export default {
             }
             
             this.$store.dispatch('createPost', formData)
-                .then(() => {
-                    this.$store.commit('createArticles');
-                    window.location = location;
-                 })
-                .catch((error)=> {
-                    console.log(error);
-                })    
+            this.$store.commit('articles');
+            window.location = location;
+
         },
     }
 }
@@ -125,6 +121,7 @@ font-size: 15px;
     border-radius: 5px;
     position: absolute;
     top: 45px;
+    z-index: 1;
 }
 
 .post_form div {

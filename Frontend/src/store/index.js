@@ -39,16 +39,12 @@ const store = createStore({
         mess: '',
         articles: {
           id: '',
-          username: '',
           date: '',
           title: '',
-          attachment:'',
+          image:'',
           content: '',
-          likes: [],
-          dislikes: [],
         },
         comments: {
-        username: '',
         content: '',
         id: '',
         }
@@ -83,12 +79,15 @@ const store = createStore({
         modifyUser: function(state, userInfos){   
           state.userInfos = userInfos;
         },
-        articlesList: function(state, articles) {
+        articles: function(state, articles) {
           state.articles = articles;
         },
-        articles: function(state, articles, user) {
-          state.user = user;
+        deleteArticles: function(state, articles) {
+          state.mess = state,
           state.articles = articles;
+        },
+        comments: function(state, comments) {
+          state.comments = comments
         }
     },
     actions: {
@@ -170,8 +169,6 @@ const store = createStore({
             instance.post('/post', articles)
               .then(function(response){
                 commit('setStatus', 'creating');
-                commit('articles', response.data)
-                console.log(response);
                 resolve(response)
               })
               .catch(function(error){
@@ -179,19 +176,18 @@ const store = createStore({
                 reject(error)
               })
           })
-        },
-        deletePost: ({commit}) => {
-            console.log(store.state.articles);
-            console.log(store.state.user);
-            commit('setStatus', 'deleting'); 
-            // instance.delete(`/post/${store.state.articles.id}`)
-            //   .then(function(){
-            //     commit('setStatus', 'deleting');
-            //     commit('articles', 'La publication a été suppriméé')
-            //   })
-            //   .catch(function(){
-            //     commit('setStatus', 'error_delete');               
-            //   })
+        }, createComment: ({commit}, comments) => {
+            return new Promise((resolve, reject) => {
+              instance.post('/comment', comments)
+                .then(function(response){
+                  commit('setStatus', 'commenting')
+                  resolve(response)
+                  .catch(function(err){
+                    commit('setStatus', 'error_comment')
+                    reject(err)
+                })
+              }) 
+          })
         },
         getComment: ({commit}) => {
             instance.get(`/comment/${store.state.comments.id}`)
@@ -210,15 +206,6 @@ const store = createStore({
               })
               .catch(function(){
                 commit('setStatus', 'error_liking');         
-              })
-        },
-        postComment: ({commit}) => {
-            instance.post('/comment')
-              .then(function() {
-                commit()
-              })
-              .catch(function(){
-
               })
         },
         deleteComment: ({commit}) => {

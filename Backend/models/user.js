@@ -16,8 +16,6 @@ module.exports = (sequelize, DataTypes) => {
     bio: DataTypes.STRING,
     photo: DataTypes.STRING,
     isAdmin: DataTypes.BOOLEAN,
-    createdAt: Date.now(),
-    updatedAt: Date.now()
   }, {
     sequelize,
     modelName: 'User',

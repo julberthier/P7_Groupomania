@@ -50,6 +50,11 @@ a {
 .container_home {
   overflow-y: scroll;
   height: 80vh;
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.container_home::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
 }
 
 .logo_central {
@@ -86,6 +91,7 @@ a {
   border-radius: 10px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .glassmorphism {

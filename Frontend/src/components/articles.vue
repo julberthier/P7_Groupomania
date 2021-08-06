@@ -1,67 +1,66 @@
 <template>
+<div class="inner">
   <div v-if="posts.length == 0" class="font post_none"> Pas de publications </div>
   
-  <div class="container_post" v-else>
-      <div class="post_box" v-for="post in posts" v-bind:key="post">
+  <div  v-else>
+      <div class="container_post" >
+            <div class="post_box" v-for="post in posts" v-bind:key="post">
 
-          <div class="container_info_post">
-              <button v-if="user.isAdmin == 1" class="delete_post_admin font" @click="deletePost()">X</button>
-              <h6> Publié le : {{post.createdAt}} </h6>
-              <h5>Auteur: {{ user.username }}</h5>
-          </div>
+                <div class="container_info_post">
+                    <button v-if="user.isAdmin == 1" class="delete_post_admin font" @click="deletePost()" :data-id="post.id" id="adminDelete">X</button>
+                    <button v-if="user.id === post.userId" class="delete_post_admin font" @click="deletePost()" :data-id="post.id" id="adminDelete">X</button>
+                    <h6 class="font"> Publié le : {{post.createdAt}} </h6>
+                    <h5 class="font">Auteur: {{ post.username }}</h5>
+                </div>
 
-            <div>
-                <h4> {{ post.title }} </h4>
-                <img :src="post.image">
-                <div class="content_post"> {{ post.content }} </div>
+                  <div class="container_content_post">
+                      <h4 class="title_post font"> {{ post.title }} </h4>
+                      <img :src="post.image" class="image">
+                      <div class="content_post font"> {{ post.content }} </div>
+                  </div>
+
+                <div class="commented_bg">
+                  <div class="comment_box font" v-if="comms.length == 0"> Il n'y a pas encore de commentaires...</div>
+                  <div class="commentElse" v-else>
+                        <div class="comments_container" v-for="comm in comms" v-bind:key="comm" >
+                          <button v-if="user.isAdmin == 1" class="delete_post_admin font"  @click="deleteComment()" id="deleteComment" :data-CI="comm.id">X</button>
+                          <button v-if="user.id === comm.userId" class="delete_post_admin font" @click="deleteComment()" id="deleteComment" :data-CI="comm.id">X</button>       
+                          <span class="font author_comm"> Auteur: {{ comm.username }}</span>                        
+                          <div class="comment_box font" > {{ comm.content }}</div>   
+                        </div>
+           
+                      </div>
+                </div>                    
+
+                  <span class="comment_send">
+                    <form @submit.prevent="submit" enctype="multipart/form-data" class="commentPost">
+                    <textarea name="comment" id="comment" cols="60" rows="2" class="font text_comment" placeholder="Laisser mon commentaire..." :data-comment="user.id" :data-AI="post.id"></textarea>
+                    <button type="button" class="font" @click="submitComment()">Envoyer</button>
+                    </form>
+                  </span>
+
             </div>
-
-            <span class="likes_container">
-                <span class="likes_box">
-                    <button>👍</button>
-                    <div>{{articles.likes.length}}</div>
-                </span>
-
-                <span class="likes_box">
-                    <button>👎</button>
-                    <div>{{articles.dislikes.length}}</div>
-                </span>          
-            </span>
-
-            <div class="commented">
-              <button v-if="user.isAdmin == 1" class="delete_post_admin font">X</button>
-              <span> Auteur: {{ comments.username }}</span>
-              <div class="comment_box" v-if="comments.length == 0"> Il n'y a pas encore de commentaires...</div>
-              <div class="comment_box" v-else> {{ comments.content }}</div>              
-            </div>
-
-            <span class="comment_send">
-              <form action="" class="commentPost">
-              <textarea name="" id="" cols="60" rows="2" placeholder="Laisser mon commentaire..."></textarea>
-              <button>Envoyer</button>
-              </form>
-            </span>
-
-      </div>
+        </div>
   </div>
+</div>
+  
 
 </template>
 
 <script>
-import useVuelidate from '@vuelidate/core'
-import { required, maxLength } from '@vuelidate/validators';
 import axios from "axios";
 import { mapState } from 'vuex';
 
 export default {
-    setup () {
-    return { v$: useVuelidate() }
-    },
     name: 'Articles',
     data: function() {
-        return {  
+        return {
+            date:'',
+            userId: '',
+            articlesId: '',  
+            content : '',
             posts: [],  
-            comments: [],      
+            comms: [],      
             isAdmin: '',  
             formStatus: null,
         }
@@ -73,13 +72,23 @@ export default {
     }
       this.$store.dispatch('getUserInfos');
 
+      let dateSort
+
       axios.get('http://localhost:3000/api/groupomania/post')
       .then(response=> {
         this.posts = response.data;
-        console.log(response);
+         response.data.map((date) => {
+         dateSort = date.createdAt;          
+         console.log(dateSort);
+        });        
       })
       .catch((err) => console.log(err))
 
+      axios.get('http://localhost:3000/api/groupomania/comment')
+      .then(response => {
+        this.comms = response.data
+      })
+      .catch((err) => console.log(err))
     },
     computed: {
       ...mapState({
@@ -87,48 +96,54 @@ export default {
         articles: 'articles',
         comments: 'comments',
       })
-    },
-     validations: {
-    commentaire: { required, maxLength: maxLength(200) },
-  },  
+    },  
   methods: {
-    async submitComment() {
-      this.v$.$touch();
-      if (this.v$.$invalid) {
-        this.formStatus = "ERROR";
-      } else {
-        this.formStatus = "PENDING";
+    submitComment() {
 
-        this.$store.dispatch('postComment')
-          .then(function() {
-            this.formStatus = "OK";
-            this.$router.push("/home");
-          })
-          .catch(function() { this.formStatus = "ERROR" }
-          );
-      }
+      const getComment = document.getElementById('comment') 
+      this.articlesId = getComment.getAttribute('data-AI')
+      this.userId = getComment.getAttribute('data-comment')
+      this.content = getComment.value;
+
+      const formData = new FormData();
+      formData.append("content", this.content)
+      formData.append("userId", this.userId)
+      formData.append("articlesId", this.articlesId)
+
+      this.$store.dispatch('createComment', formData)
+      this.$store.commit('comments');
+      window.location = location;
     },
-    // Delete post
-    deletePost() {
-      this.$store.dispatch('deletePost')
-        .then(() => { 
-          this.$router.push("/home") 
+    deletePost() { 
+    const id = document.getElementById('adminDelete')
+    const idDelete = id.getAttribute('data-id');
+
+      axios.delete(`http://localhost:3000/api/groupomania/post/${idDelete}`)
+        .then(()=> {
+          window.location = location;
         })
-        .catch((error) => console.log(error));
+        .catch((error)=> console.log(error))
+
+        const Commentid = document.getElementById('comment');
+        const CommentDelete = Commentid.getAttribute('data-CI');
+
+          axios.delete(`http://localhost:3000/api/groupomania/comment/${CommentDelete}`)
+            .then(()=> {
+              window.location = location;
+            })
+            .catch((error)=> console.log(error))
     },
-    // Delete comment
-    async deleteComment() {
-      await axios
-      this.$store.dispatch('deleteComment')
-        .then(() => {
-          this.$router.push("/home");
+    deleteComment() {
+
+    const id = document.getElementById('deleteComment');
+    const idDelete = id.getAttribute('data-CI');
+
+      axios.delete(`http://localhost:3000/api/groupomania/comment/${idDelete}`)
+        .then(()=> {
+          window.location = location;
         })
-        .catch((error) =>
-          console.log(error)
-        );
-    },
-    
-  },
+        .catch((error)=> console.log(error))
+    }},
 }
 
 </script>
@@ -142,15 +157,23 @@ export default {
   font-size: 20px;
 }
 
+.inner {
+ position: relative;
+}
+
 .container_post {
-  height: 50vh;
-  margin-top: 4vh;
+  position: absolute;
+  top: 25vh;
   width: 100%;
-  background-color: rgba(128, 128, 128, 0.15);
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 50px 0;
+  align-items: center;
+  flex-direction: column;
+  height: auto;
+  overflow-y: scroll;
+}
+
+.container_post::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
 }
 
 .post_box {
@@ -159,9 +182,13 @@ export default {
   display: flex;
   align-items: center;
   flex-direction: column;
-  background-color: honeydew;
   position: relative;
-  margin: 25px;
+  background-color: honeydew;
+  margin: 15px 0;
+}
+
+.post_box::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
 }
 
 .container_info_post {
@@ -172,6 +199,11 @@ export default {
   padding-top: 1vh;
   display: flex;
   justify-content: space-evenly;
+}
+
+.image {
+  max-height: 200px;
+  max-width: 200px;
 }
 
 .delete_post_admin{
@@ -185,55 +217,87 @@ export default {
   cursor: pointer;
 }
 
+.text_comment{
+  padding-left: 5px;
+}
+
+.delete_post_admin:hover:after{
+  content: 'Supprimer !';
+  width: 100px;
+  height: 25px;
+  font-size: 12px;
+  color: black;
+  background-color: white;
+  position: absolute;
+  top: 0px;
+  right: 15px;
+  border-radius: 10px;
+  padding: 5px;
+}
+
 .content_post {
   height: 7vh;
 }
 
-.likes_container {
-  display: flex;
-  flex-direction: row; 
-  justify-content: center; 
-  width: 50%;
-}
-
-.likes_box {
-  width: 100%;
-}
-
-.likes_box button {
-  padding: 6px;
-  margin: 10px 0;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.likes_box button:hover {
-  background-color: gray;
-}
-
-.commented{
+.commented_bg {
   width: 100%;
   overflow-y: scroll;
-  max-height: 8vh;
+  scroll-behavior: smooth;
+  max-height: 10vh;
   position: relative;
   background-color: hsl(57, 11%, 62%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
   margin-bottom: 4vh;
+  border-top: 2px solid rgba(0, 0, 0, 0.5);
+}
+
+.commented_bg::-webkit-scrollbar {
+  width: 1em;
+}
+
+.commented_bg::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.commented_bg::-webkit-scrollbar-thumb {
+  background-color: rgb(255, 255, 255);
+  outline: 1px solid slategrey;
+}
+
+.commentElse {
+  width: 100%;
+}
+
+.comments_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  border-top: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 2px 0;
 }
 
 .comment_box {
-  background-color: honeydew;
   width: 80%;
+  background-color: honeydew;
   border-radius: 5px;
+  padding: 8px 0;
 }
 
 .comment_send {
   width: 100%;
   position: absolute;
   bottom: 0;
+}
+
+.author_comm {
+  margin-bottom: 5px;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 .commentPost {

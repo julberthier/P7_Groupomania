@@ -50,19 +50,18 @@ exports.modifyPost = (req, res, next) => {
 };
 
 exports.deletePost = (req, res, next) => {
-    Post.findOne({ id: req.params.id })    
+    const id = req.params.id;
+
+   Post.destroy({raw: true, where: { id: id }}) 
         .then(post => {
-            const filename = post.attachment.split('/images/')[1];
-            fs.unlink(`images/${filename}`, () =>{
-                Post.deleteOne({ id: req.params.id })
-                    .then(() => {
-                        res.status(200).json({message: "Publication supprimée !"});
-                    })
-                    .catch(error => res.status(400).json({ error: error }));
+            // if (Post.image !== null ) {
+            //     const filename = post.image.split('/images/')[1];
+            //     fs.unlink(`images/${filename}`);   
+            // }          
+            res.status(200).json({message: "Publication supprimée !"});
             })
-        })
-        .catch(error => res.status(500).json({ error: error }));
-    }
+            .catch(error => res.status(400).json({ message:"c'est l'erreur" }));
+}
 
 exports.getAllPost = (req, res, next) => {
     Post.findAll()
