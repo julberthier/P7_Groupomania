@@ -4,10 +4,7 @@ const { Comment } = require('../models');
 
 exports.createComment = async (req, res, next) => {
     const commentaire = {
-        content: req.body.content,
-        articlesId: req.body.articlesId,
-        userId: req.body.userId,
-        username: req.body.username
+        ...req.body
       };
 
       await Comment.create(commentaire)
@@ -66,3 +63,8 @@ exports.modifyComments = (req, res, next) => {
         res.status(500).send({ message: "Operation impossible, veuillez réessayer ulterieurement." });
       });
 }
+
+// exports.getOneCommentList = (req, res, next) => {
+// Comment.findOne({ raw:True })
+
+// }

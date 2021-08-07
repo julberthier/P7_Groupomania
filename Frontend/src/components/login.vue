@@ -1,6 +1,5 @@
 <template>
-  <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_login"/>
-
+  <div class="logo_login"></div>
   <div class="glassmorphism container_central fs10">
     <div class=" container_form">
 
@@ -130,6 +129,18 @@ img {
   display: flex;
   justify-content: center;  
   flex-direction: column;
+}
+
+.logo_login::before{
+  display: inline-block;
+  content: '';
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  background-size: 180px 180px;
+  height:180px;
+  width:180px;
+  background-image: url('../assets/icon-left-font-monochrome-white.png');
 }
 
 .glassmorphism {

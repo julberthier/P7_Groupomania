@@ -4,7 +4,6 @@
         <div class="logo_div">    
             <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_central"/>
         </div>
-        <div></div>
         <div class="container_home">
             <Creator />
             <Articles />
@@ -72,11 +71,14 @@ a {
 }
 
 .nav_btn {
+    transition: all 0.20s ease-in-out;
     cursor: pointer;
 }
 
 .nav_btn:hover {
-    color: rgba(63, 177, 230, 0.35);
+    color: white;
+    transform: translateY(-5px);
+    transition: all 0.20s ease-in-out;
 }
 
 .fs10 {

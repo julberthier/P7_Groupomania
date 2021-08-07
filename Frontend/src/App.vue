@@ -28,12 +28,11 @@ export default {
 }
 
 body {  
-  background: #ef32d9;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #89fffd, #ef32d9);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, #89fffd, #ef32d9); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(153deg, rgba(209,81,90,1) 50%, rgba(9,31,67,1) 100%);
   height: 100vh;
   width: 100%;
   background-repeat: no-repeat;
+  background-size: cover;
 }
 
 </style>

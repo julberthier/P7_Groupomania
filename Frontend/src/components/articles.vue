@@ -2,15 +2,20 @@
 <div class="inner">
   <div v-if="posts.length == 0" class="font post_none"> Pas de publications </div>
   
-  <div  v-else>
+  <div v-else>
       <div class="container_post" >
             <div class="post_box" v-for="post in posts" v-bind:key="post" onload="getDate()">
 
                 <div class="container_info_post">
-                    <button v-if="user.isAdmin == 1" class="delete_post_admin font" @click="deletePost()" :data-id="post.id" id="adminDelete">X</button>
-                    <button v-if="user.id === post.userId" class="delete_post_admin font" @click="deletePost()" :data-id="post.id" id="adminDelete">X</button>
-                    <h6 class="font"> Publié le : {{ post.createdAt }} </h6>
-                    <h5 class="font">Auteur: {{ post.username }}</h5>
+                    <button v-if="user.isAdmin == 1" class="delete_post_admin font" @click="deletePost" :data-id="post.id" id="adminDelete">X</button>
+                    <button v-if="user.id === post.userId" class="delete_post_admin font" @click="deletePost" :data-id="post.id" id="adminDelete">X</button>
+                    <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_small_post">
+                    <h6 class="font"> Publié le : {{ post.date }} </h6>
+                    <div class="userInfosPost">            
+                      <img :src="post.photoUser" alt="" class="postUserPhoto">
+                      <h5 class="font">{{ post.username }}</h5>
+                    </div>
+        
                 </div>
 
                   <div class="container_content_post">
@@ -20,12 +25,12 @@
                   </div>
 
                 <div class="commented_bg">
-                  <div class="comment_box font" v-if="comms.length == 0"> Il n'y a pas encore de commentaires...</div>
+                  <div class="comment_box font no_comm" v-if=" comms.length == 0"> Il n'y a pas encore de commentaires...</div>
                   <div class="commentElse" v-else>
-                        <div class="comments_container" v-for="comm in comms" v-bind:key="comm" >
-                          <button v-if="user.isAdmin == 1" class="delete_post_admin font"  @click="deleteComment()" id="deleteComment" :data-CI="comm.id">X</button>
-                          <button v-if="user.id === comm.userId" class="delete_post_admin font" @click="deleteComment()" id="deleteComment" :data-CI="comm.id">X</button>       
-                          <span class="font author_comm"> Auteur: {{ comm.username }}</span>                        
+                        <div class="comments_container" v-for="comm in comms" v-bind:key="comm.articlesId">
+                          <button v-if="user.isAdmin == 1" class="delete_post_admin font"  @click="deleteComment" id="deleteComment" :data-CI="comm.id">X</button>
+                          <button v-if="user.id === comm.userId" class="delete_post_admin font" @click="deleteComment" id="deleteComment" :data-CI="comm.id">X</button>       
+                          <div class="font comment_infos"><span><img :src="post.photoUser" alt="" class="postUserPhoto"><span class="author_comm">{{ comm.username }}</span></span>  <span>Publié le  : {{ comm.date }}</span></div>                        
                           <div class="comment_box font" > {{ comm.content }}</div>   
                         </div>
            
@@ -34,8 +39,10 @@
 
                   <span class="comment_send">
                     <form @submit.prevent="submit" enctype="multipart/form-data" class="commentPost">
-                    <textarea name="comment" id="comment" cols="60" rows="2" class="font text_comment" placeholder="Laisser mon commentaire..." :data-comment="user.id" :data-AI="post.id" :data-username="user.username"></textarea>
-                    <button type="button" class="font" @click="submitComment()">Envoyer</button>
+                    <img :src="user.photo" alt="" class="photoUserComment">
+                    <textarea name="comment" id="comment" cols="60" rows="2" class="font text_comment getCommentValue" placeholder="Laisser mon commentaire..." v-model="v$.comment.$model"></textarea>
+                    <div v-if="!v$.comment.$required && formStatus == 'error'">Ca ne peut pas être vide !</div>
+                    <button type="button" class="font getComment" :data-comment="user.id" :data-AI="post.id" :data-username="user.username" :data-photo="user.photo" @click="submitComment">Envoyer</button>
                     </form>
                   </span>
 
@@ -48,18 +55,25 @@
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core'
+import { required } from '@vuelidate/validators';
 import axios from "axios";
 import { mapState } from 'vuex';
 
 export default {
+  setup () {
+    return { v$: useVuelidate() }
+  },
     name: 'Articles',
     data: function() {
         return {
+            postId: '',
             userId: '',
             articlesId: '',  
             content : '',
             posts: [],  
-            comms: [],      
+            comms: [],
+            comment: '',      
             isAdmin: '',  
             formStatus: null,
         }
@@ -79,7 +93,13 @@ export default {
 
       axios.get('http://localhost:3000/api/groupomania/comment')
       .then(response => {
-        this.comms = response.data
+          this.comms = response.data
+          
+          let articlesIds = response.data;
+          for (let articlesId of articlesIds) {
+            this.postId = articlesId;
+            console.log(articlesId);
+          }
       })
       .catch((err) => console.log(err))
     },
@@ -90,48 +110,66 @@ export default {
         comments: 'comments',
       })
     },  
-  methods: {
-    submitComment() {
-
-      const getComment = document.getElementById('comment') 
-      this.articlesId = getComment.getAttribute('data-AI')
-      this.userId = getComment.getAttribute('data-comment')
-      const username = getComment.getAttribute('data-username')
-      this.content = getComment.value;
-
-      const formData = new FormData();
-      formData.append("content", this.content)
-      formData.append("userId", this.userId)
-      formData.append("articlesId", this.articlesId)
-      formData.append("username", username)
-      
-      this.$store.dispatch('createComment', formData)
-      this.$store.commit('comments');
-      window.location = location;
+    validations: {    
+        comment: { 
+            required, 
+        }
     },
-    deletePost() { 
-    const id = document.getElementById('adminDelete')
-    const idDelete = id.getAttribute('data-id');
+  methods: {
+    submitComment: function (event) {  
+
+                let elemente
+                document.querySelectorAll(".getCommentValue").forEach((element) => {
+                      if  (element.value === '' || null) {
+                        return
+                      } 
+                      else {
+                        elemente = element.value
+                      }
+                })  
+                
+                this.v$.$touch();
+            if (this.v$.$invalid) {
+                this.formStatus = 'error';
+            } else {
+                this.content = elemente
+                this.articlesId = event.target.getAttribute('data-AI')
+                this.userId = event.target.getAttribute('data-comment')
+                const username = event.target.getAttribute('data-username')
+                const photoUser = event.target.getAttribute('data-photo')
+
+                const date = new Date();
+                const options = {weekday: "long", year: "numeric", month: "long", day: "2-digit"};
+                const newDate = date.toLocaleDateString("fr-FR", options)
+
+                const formData = new FormData();
+                formData.append("content", this.content)
+                formData.append("userId", this.userId)
+                formData.append("articlesId", this.articlesId)
+                formData.append("username", username)
+                formData.append("date", newDate)
+                formData.append("photoUser", photoUser)
+
+                this.$store.dispatch('createComment', formData)
+                this.$store.commit('comments');
+                window.location = location;  
+              }   
+    },
+    deletePost: function(event) { 
+    const idDelete = event.target.getAttribute('data-id');
 
       axios.delete(`http://localhost:3000/api/groupomania/post/${idDelete}`)
-        .then(()=> {
-          window.location = location;
-        })
+        .then(()=> { window.location = location })
         .catch((error)=> console.log(error))
 
-        const Commentid = document.getElementById('comment');
-        const CommentDelete = Commentid.getAttribute('data-CI');
+        const CommentDelete = event.target.getAttribute('data-CI');
 
-          axios.delete(`http://localhost:3000/api/groupomania/comment/${CommentDelete}`)
-            .then(()=> {
-              window.location = location;
-            })
+        axios.delete(`http://localhost:3000/api/groupomania/comment/${CommentDelete}`)
+            .then(()=> {window.location = location})
             .catch((error)=> console.log(error))
     },
-    deleteComment() {
-
-    const id = document.getElementById('deleteComment');
-    const idDelete = id.getAttribute('data-CI');
+    deleteComment: function(event) {
+    const idDelete = event.target.getAttribute('data-CI');
 
       axios.delete(`http://localhost:3000/api/groupomania/comment/${idDelete}`)
         .then(()=> {
@@ -156,6 +194,14 @@ export default {
  position: relative;
 }
 
+.userInfosPost{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100px;
+}
+
 .container_post {
   position: absolute;
   top: 25vh;
@@ -165,6 +211,19 @@ export default {
   flex-direction: column;
   height: auto;
   overflow-y: scroll;
+}
+
+.postUserPhoto{
+  height: 30px;
+  width: 30px;
+  border-top-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border: 2px solid white;
+}
+
+.logo_small_post {
+  height: 120px;
+  width: 120px;
 }
 
 .container_post::-webkit-scrollbar { 
@@ -180,6 +239,8 @@ export default {
   position: relative;
   background-color: honeydew;
   margin: 15px 0;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .post_box::-webkit-scrollbar { 
@@ -187,18 +248,24 @@ export default {
 }
 
 .container_info_post {
-  background-color: grey;
+  background-color: #949aa2;
   position: relative;
   width: 100%;
   height: 4vh;
-  padding-top: 1vh;
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
+
+}
+
+.title_post {
+  padding: 10px 0;
+  font-size: 15px;
 }
 
 .image {
-  max-height: 200px;
-  max-width: 200px;
+  max-height: 400px;
+  max-width: 400px;
 }
 
 .delete_post_admin{
@@ -231,21 +298,37 @@ export default {
 }
 
 .content_post {
-  height: 7vh;
+  height: fit-content;
+  font-size: 16px;
+  padding: 5px 0 15px 0;
 }
 
 .commented_bg {
   width: 100%;
   overflow-y: scroll;
   scroll-behavior: smooth;
-  max-height: 10vh;
+  max-height: 12vh;
+  min-height: 5.2vh;
   position: relative;
-  background-color: hsl(57, 11%, 62%);
+  background-color: #737c8c;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 4vh;
+  margin-bottom: 5vh;
   border-top: 2px solid rgba(0, 0, 0, 0.5);
+}
+
+.comment_infos {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.comment_infos span {
+  display: flex;
+  align-items: center;
 }
 
 .commented_bg::-webkit-scrollbar {
@@ -265,6 +348,13 @@ export default {
   width: 100%;
 }
 
+.photoUserComment {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
 .comments_container {
   display: flex;
   flex-direction: column;
@@ -272,8 +362,7 @@ export default {
   justify-content: center;
   width: 100%;
   position: relative;
-  border-top: 1px solid rgba(0, 0, 0, 0.5);
-  padding: 2px 0;
+  padding: 2px 0 10px 0;
 }
 
 .comment_box {
@@ -283,6 +372,10 @@ export default {
   padding: 8px 0;
 }
 
+.no_comm {
+  margin: 5px 0 0 0;
+}
+
 .comment_send {
   width: 100%;
   position: absolute;
@@ -290,25 +383,35 @@ export default {
 }
 
 .author_comm {
-  margin-bottom: 5px;
+  margin: 0 0 5px 5px;
   font-size: 14px;
-  text-transform: uppercase;
+
 }
 
 .commentPost {
-  background-color: grey;
+  background-color: #949aa2;
   width: 100%;
-  height: 4vh;
+  height: fit-content;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
   position: absolute;
   bottom: 0;
+  padding: 5px 0;
 }
 
 .commentPost button {
   padding: 4px;
 }
+
+span form button {
+  cursor: pointer;
+
+}
+span form button:hover {
+  box-shadow: inset 0px -1px 6px 0px rgba(0, 0, 0, 0.5);
+}
+
 
 
 </style>

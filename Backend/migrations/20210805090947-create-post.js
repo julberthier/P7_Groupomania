@@ -16,6 +16,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      photoUser: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
       title: {
         allowNull: false,
         type: Sequelize.STRING
@@ -26,6 +30,10 @@ module.exports = {
       },
       image: {
         allowNull: true,
+        type: Sequelize.STRING
+      },
+      date: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {

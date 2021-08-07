@@ -5,6 +5,8 @@ const { User } = require('../models');
 exports.createPost = async (req, res, next) => {
 
     const postObject = JSON.parse(JSON.stringify(req.body));
+    console.log(postObject);
+    
     let articles
 
     if (req.file !== undefined || '') {    

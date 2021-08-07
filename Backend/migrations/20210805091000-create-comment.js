@@ -18,9 +18,17 @@ module.exports = {
       },
       articlesId: {
         allowNull: false,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
+      },
+      photoUser: {
+        allowNull: false,
+        type: Sequelize.STRING
       },
       content: {
+        allowNull: false,
+        type: Sequelize.STRING
+      }, 
+      date: {
         allowNull: false,
         type: Sequelize.STRING
       },

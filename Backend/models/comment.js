@@ -9,7 +9,9 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING,
     userId: DataTypes.STRING,
     content: DataTypes.STRING,
-    articlesId: DataTypes.INTEGER,
+    photoUser: DataTypes.STRING,
+    articlesId: DataTypes.STRING,
+    date: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Comment',

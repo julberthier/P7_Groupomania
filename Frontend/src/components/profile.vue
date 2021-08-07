@@ -43,7 +43,6 @@ export default {
     username: '',
     bio: '',
     status: '',
-    image: null,   
     }
   },
   mounted: function () {
@@ -69,7 +68,6 @@ export default {
     },    
     modified: function(){
       console.log(this.image);
-      // const self = this;
       const bio = document.getElementById('bio').value
       this.bio = bio
 
@@ -77,16 +75,10 @@ export default {
       this.username = username
 
       const formData = new FormData();
-      if (this.image !== null || "") {
         formData.append("image", this.image)
         formData.append("username", this.username)
-        formData.append("bio", this.bio)
-      }
-      else {
-        formData.append("username", this.username)
-        formData.append("bio", this.bio)
-      }
-
+        formData.append("bio", this.bio)        
+      
       this.$store.dispatch('modify', formData)
         .then(function() {
           window.location = location;
@@ -126,7 +118,10 @@ input {
 div img {
   width: 80px;
   height: 80px;
+  border-radius: 50%;
+  object-fit: fill;
 }
+
 .fs20{
   font-size: 20px;
 }

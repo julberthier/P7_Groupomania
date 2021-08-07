@@ -10,7 +10,11 @@
         <div class="container_users">
             <button type="button" @click="updateList()">Mettre à jour la liste</button>
         <div class="form_container_size">
-                <li v-for="user in users" v-bind:key="user" class="font fs15"><p>Utilisateur:</p><span @click="getUser()" class="clickable getUser" :data-id="user.id">{{ user.username}}</span>, <p>Bio:</p> {{user.bio}}
+                <li v-for="user in users" v-bind:key="user" class="font fs15">
+                    <p>Utilisateur:</p>
+                    <span @click="getUser" class="clickable getUser" :data-id="user.id">{{ user.username}}</span>
+                    <p>Bio:</p>
+                    <span class="userBio">{{user.bio}}</span>
                 </li>
         </div>            
         </div>   
@@ -54,9 +58,7 @@ export default {
         .then(response => this.users = response.data)
         .catch((err) => console.log(err))
     }, 
-    getUser: function() {
-        document.querySelectorAll(".getUser").forEach((element) => {
-            element.addEventListener("click", (event) => {
+    getUser: function(event) {
             let id = event.target.getAttribute("data-id");
             axios
             .get(`http://localhost:3000/api/groupomania/user/${id}`)
@@ -65,11 +67,7 @@ export default {
                 localStorage.setItem('userId', JSON.stringify(id))
                 this.$router.push('/p-user');
             })
-            .catch((err) => console.log(err))
-            })
-        })
-
-
+            .catch((err) => console.log(err))        
     }
   }
 }
@@ -89,10 +87,19 @@ export default {
   top: 15px;
 }
 
-.container_form button {
+.userBio {
+    display: block;
+    text-overflow: ellipsis;
+    width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.container_users button {
     width: 150px;
-    height: 20px;
-    padding-bottom: 15px;
+    height: 30px;
+    padding: 6px;
+    cursor: pointer;
 }
 
 .container_users {
@@ -125,6 +132,11 @@ li p {
 
 .clickable {
     cursor: pointer;
+}
+
+.clickable:hover {
+    color: #d7d7d7;
+    transition: color 0.10s ease-in-out;
 }
 
 </style>

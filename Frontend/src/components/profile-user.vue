@@ -73,7 +73,10 @@ input {
 div img {
   width: 80px;
   height: 80px;
+  border-radius: 50%;
+  object-fit: fill;
 }
+
 .fs20{
   font-size: 20px;
 }

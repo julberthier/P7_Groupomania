@@ -75,6 +75,15 @@ export default {
         const userId = getId.getAttribute('data-id')
         const username = getId.getAttribute('data_username')
 
+        let photo = localStorage.getItem('user')
+        let getphoto = JSON.parse(photo).photo
+
+        const date = new Date();
+        const options = {weekday: "long", year: "numeric", month: "long", day: "2-digit"};
+        const newDate = date.toLocaleDateString("fr-FR", options)
+
+        console.log(newDate);
+
             const formData = new FormData();
                 if (this.image !== null || "") {
                     formData.append("image", this.image);
@@ -82,25 +91,28 @@ export default {
                     formData.append("content", this.content);
                     formData.append("userId", userId)
                     formData.append("username" , username)
+                    formData.append("date", newDate)
+                    formData.append("photoUser", getphoto)
                 } else {
                     formData.append("title", this.title);
                     formData.append("content", this.content);
                     formData.append("userId", userId)
                     formData.append("username", username)
+                    formData.append("date", newDate)
+                    formData.append("photoUser", getphoto)
                 }
 
             this.v$.$touch();
             if (this.v$.$invalid) {
                 this.formStatus = 'error';
-                console.log("erreur");
             } else {
-                console.log("Pending");
-                this.formStatus = 'pending';      
+                this.formStatus = 'pending'; 
+                this.$store.dispatch('createPost', formData)
+                this.$store.commit('articles');
+                window.location = location;     
             }
             
-            this.$store.dispatch('createPost', formData)
-            this.$store.commit('articles');
-            window.location = location;
+
         },
     }
 }
@@ -118,7 +130,7 @@ font-size: 15px;
     justify-content: space-evenly;
     align-items: center;
     width: 100%;
-    background-color: whitesmoke;
+    background-color: #d7d7d7;
     height: 30vh;
     border-radius: 5px;
     position: absolute;
