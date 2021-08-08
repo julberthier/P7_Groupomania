@@ -1,7 +1,7 @@
 <template>
   <div class="glassmorphism container_central fs10">
     <div class=" container_form">
-      <span @click="goBack()" class="back_btn">⬅️ Retour à l'accueil </span> 
+      <span @click="goBack()" class="back_btn font">⬅️ Retour à l'accueil </span> 
       <div class="font fs20"> Profil de l'utilisateur </div>
 
         <div class="container_perso"> 
@@ -11,7 +11,7 @@
             </div>
             <div > 
                <span for="photo" class="font fs15">son avatar :</span>  
-              <img :src="user.photo"/>
+              <img :src="user.photo" alt="photo de profil de l'utilisateur"/>
             </div>
             <div>
               <span class="font fs15" for="bio" >Sa bio : {{ user.bio }}</span>

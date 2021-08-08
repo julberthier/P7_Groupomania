@@ -7,25 +7,26 @@
     >
       <div>
           <label for="title" class="font">Titre de la publication</label>
-          <input type="text" name="title" id="title" placeholder="Titre..." v-model="v$.title.$model"/> 
+          <input type="text" name="title" id="title" placeholder="Titre..." v-model="v$.title.$model" aria-label="zone pour le titre de la publication"/> 
             <div v-if="!v$.title.$required && formStatus == 'error'" class="form_error">
                 Ce champ est obligatoire !
             </div>          
       </div>
       <div>
           <label for="content" class="font">Contenu de la publication</label>
-          <textarea rows="5" cols="55" name="content" id="content" placeholder="Contenu..." v-model="v$.content.$model"></textarea>
+          <textarea rows="5" cols="55" name="content" id="content" placeholder="Contenu..." v-model="v$.content.$model" aria-label="zone pour le contenu de la publication"></textarea>
             <div v-if="!v$.content.$required && formStatus == 'error'" class="form_error">
                 Ce champ est obligatoire !
             </div>   
       </div>
       <div>
           <label for="image" class="font">Ajouter une image</label>
-          <input type="file" name="image" ref="image" id="image" @change="upload">
+          <input type="file" name="image" ref="image" id="image" @change="upload" aria-label="zone pour l'image de la publication">
       </div>
       <div>
-            <button type="button" v-if="formStatus == 'pending'" class="font submit_post">En cours...</button>
-            <button type="button" v-else class="font submit_post" @click="submit()" :data-id="user.id" :data_username="user.username" id="submit_btn">Publier</button>
+            <label for="postbtn" hidden>Bouton d'envoi du formulaire</label>
+            <button type="button" id="postbtn" v-if="formStatus == 'pending'" class="font submit_post">En cours...</button>
+            <button type="button" v-else class="font submit_post" @click="submit()" :data-id="user.id" :data_username="user.username" id="submit_btn" aria-label="bouton pour l'envoi de la publication">Publier</button>
             <span v-if="!v$.content.$required && formStatus == 'error'" class="form_error">Veuillez remplir tous les champs</span>
       </div>
   </form>

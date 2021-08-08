@@ -3,9 +3,9 @@
 
     <div class="glassmorphism container_central fs10">
         
-        <span @click="goBack()" class="back_btn">⬅️ Retour à l'accueil </span>
+        <span @click="goBack()" class="back_btn font">⬅️ Retour à l'accueil </span>
         <div class="logo_div">    
-            <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_central"/>
+            <img src="@/assets/icon-left-font-monochrome-white.png" alt="logo du site groupomania" class="logo_central"/>
         </div>
         <div class="container_users">
             <button type="button" @click="updateList()">Mettre à jour la liste</button>

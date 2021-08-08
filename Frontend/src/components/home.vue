@@ -2,7 +2,8 @@
 <Nav />
     <div class="glassmorphism container_central fs10">
         <div class="logo_div">    
-            <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_central"/>
+            <img src="@/assets/icon-left-font-monochrome-white.png" alt="logo du site Groupomania" class="logo_central"/>
+            <h1 hidden> Bienvenue sur le reseau social Groupomania</h1>
         </div>
         <div class="container_home">
             <Creator />

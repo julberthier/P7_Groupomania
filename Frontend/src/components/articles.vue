@@ -10,17 +10,17 @@
                     <button v-if="user.isAdmin == 1" class="delete_post_admin font" @click="deletePost" :data-id="post.id" id="adminDelete">X</button>
                     <button v-if="user.id === post.userId" class="delete_post_admin font" @click="deletePost" :data-id="post.id" id="adminDelete">X</button>
                     <img src="@/assets/icon-left-font-monochrome-white.png" alt="" class="logo_small_post">
-                    <h6 class="font"> Publié le : {{ post.date }} </h6>
+                    <h2 class="font postdate"> Publié le : {{ post.date }} </h2>
                     <div class="userInfosPost">            
-                      <img :src="post.photoUser" alt="" class="postUserPhoto">
-                      <h5 class="font">{{ post.username }}</h5>
+                      <img :src="post.photoUser" alt="Photo de profil de l'utilisateur" class="postUserPhoto">
+                      <h3 class="font postUserName">{{ post.username }}</h3>
                     </div>
         
                 </div>
 
                   <div class="container_content_post">
                       <h4 class="title_post font"> {{ post.title }} </h4>
-                      <img :src="post.image" class="image">
+                      <img :src="post.image" class="image" alt="Image de la publication">
                       <div class="content_post font"> {{ post.content }} </div>
                   </div>
 
@@ -30,7 +30,7 @@
                         <div class="comments_container" v-for="comm in comms" v-bind:key="comm.articlesId">
                           <button v-if="user.isAdmin == 1" class="delete_post_admin font"  @click="deleteComment" id="deleteComment" :data-CI="comm.id">X</button>
                           <button v-if="user.id === comm.userId" class="delete_post_admin font" @click="deleteComment" id="deleteComment" :data-CI="comm.id">X</button>       
-                          <div class="font comment_infos"><span><img :src="post.photoUser" alt="" class="postUserPhoto"><span class="author_comm">{{ comm.username }}</span></span>  <span>Publié le  : {{ comm.date }}</span></div>                        
+                          <div class="font comment_infos"><span><img :src="comm.photoUser" alt="photo de profil de l'utilisateur" class="postUserPhoto"><span class="author_comm">{{ comm.username }}</span></span><span class="author_comm">Publié le : {{ comm.date }}</span></div>                        
                           <div class="comment_box font" > {{ comm.content }}</div>   
                         </div>
            
@@ -39,10 +39,10 @@
 
                   <span class="comment_send">
                     <form @submit.prevent="submit" enctype="multipart/form-data" class="commentPost">
-                    <img :src="user.photo" alt="" class="photoUserComment">
-                    <textarea name="comment" id="comment" cols="60" rows="2" class="font text_comment getCommentValue" placeholder="Laisser mon commentaire..." v-model="v$.comment.$model"></textarea>
+                    <img :src="user.photo" alt="photo de l'utilisateur" class="photoUserComment">
+                    <textarea name="comment" id="comment-2" cols="60" rows="2" class="font text_comment getCommentValue" placeholder="Laisser mon commentaire..." v-model="v$.comment.$model" aria-label="Zone pour ecrire un commentaire" aria-labelledby="comment-2"></textarea>
                     <div v-if="!v$.comment.$required && formStatus == 'error'">Ca ne peut pas être vide !</div>
-                    <button type="button" class="font getComment" :data-comment="user.id" :data-AI="post.id" :data-username="user.username" :data-photo="user.photo" @click="submitComment">Envoyer</button>
+                    <button type="button" id="btncommentsend" class="font getComment" :data-comment="user.id" :data-AI="post.id" :data-username="user.username" :data-photo="user.photo" @click="submitComment" aria-label="Bouton pour envoyer un commentaire" aria-labelledby="btncommentsend">Envoyer</button>
                     </form>
                   </span>
 
@@ -230,6 +230,14 @@ export default {
     display: none;  /* Safari and Chrome */
 }
 
+.postdate {
+  font-size: 12px;
+}
+
+.postUserName {
+    font-size: 12px;
+}
+
 .post_box {
   width: 90%;
   height: fit-content;
@@ -384,8 +392,7 @@ export default {
 
 .author_comm {
   margin: 0 0 5px 5px;
-  font-size: 14px;
-
+  font-size: 15px;
 }
 
 .commentPost {

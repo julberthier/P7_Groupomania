@@ -56,10 +56,10 @@ exports.deletePost = (req, res, next) => {
 
    Post.destroy({raw: true, where: { id: id }}) 
         .then(post => {
-            // if (Post.image !== null ) {
-            //     const filename = post.image.split('/images/')[1];
-            //     fs.unlink(`images/${filename}`);   
-            // }          
+            if (Post.image !== null ) {
+                const filename = post.image.split('/images/')[1];
+                fs.unlink(`images/${filename}`);   
+            }          
             res.status(200).json({message: "Publication supprimée !"});
             })
             .catch(error => res.status(400).json({ message:"c'est l'erreur" }));

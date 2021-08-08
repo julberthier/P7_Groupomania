@@ -1,31 +1,31 @@
 <template>
   <div class="glassmorphism container_central fs10">
     <div class=" container_form">
-      <span @click="goBack()" class="back_btn">⬅️ Retour à l'accueil </span> 
+      <span @click="goBack()" class="back_btn font">⬅️ Retour à l'accueil </span> 
       <div class="font fs20">Mon espace perso</div>
 
       <form @submit.prevent="submit" enctype="multipart/form-data">  
         <div class="container_perso"> 
             <div class="user_info font">
-              <input type="text" placeholder="Changer mon pseudonyme" v-if="status == 'modifying'" id="username" :value="user.username">
+              <input type="text" placeholder="Changer mon pseudonyme" v-if="status == 'modifying'" id="username" :value="user.username" aria-label="zone pour changer votre pseudo">
               <label for='username' class="fs15" v-else>Mon pseudonyme:  {{ user.username }} </label>
               <span v-if="status == 'modifying'"> Adresse email non modifiable </span>
               <span class="fs15" v-else>Mon adresse email:  {{ user.email }} </span>
             </div>
             <div > 
                <label for="image" class="font fs15">Mon avatar :</label>  
-              <input type="file"  name="image" ref="image" placeholder="Changer mon avatar" v-if="status == 'modifying'" id="photo" @change="upload">
-              <img :src="user.photo" v-else/>
+              <input type="file"  name="image" ref="image" placeholder="Changer mon avatar" v-if="status == 'modifying'" id="photo" @change="upload" aria-label="zone pour changer votre image de profil">
+              <img :src="user.photo" alt="photo de profil de l'utilisateur" v-else/>
             </div>
             <div>
-              <textarea v-if="status == 'modifying'" id="bio" placeholder="Changer ma bio..." :value="user.bio"></textarea>
+              <textarea v-if="status == 'modifying'" id="bio" placeholder="Changer ma bio..." :value="user.bio" aria-label="zone pour changer votre biographie"></textarea>
               <label class="font fs15" for="bio" v-else>Ma bio : {{ user.bio }}</label>
             </div>
           </div>
           <span class="btn_account_manage">
-            <button type="button" class="profile_btn minima font" v-if="status == 'modifying'" @click="modified()">Sauvegarder mes informations</button>
-            <button type="button" class="profile_btn minima font" @click="modify()" v-else>Modifier mon compte</button>
-            <button type="button" class="profile_btn minima font" @click="deleteUser()">Supprimer mon compte</button>
+            <button type="button" class="profile_btn minima font" v-if="status == 'modifying'" @click="modified()" aria-label="zone pour sauvegarder vos changements">Sauvegarder mes informations</button>
+            <button type="button" class="profile_btn minima font" @click="modify()" v-else aria-label="zone pour modifier votre compte">Modifier mon compte</button>
+            <button type="button" class="profile_btn minima font" @click="deleteUser()" aria-label="zone pour supprimer votre compte">Supprimer mon compte</button>
         </span>
       </form>
         
